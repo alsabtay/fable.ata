@@ -1,8 +1,13 @@
+#' @keywords package
+"_PACKAGE"
+
+globalVariables(c(".","self", "origin"))
+
 #' @import stats
+#' @import fabletools
 #' @import rlang
 #' @import tsibble
-#' @import fabletools
 #' @import ATAforecasting
-#' @importFrom dplyr mutate transmute select rename
-#' @useDynLib fable.ata, .registration = TRUE
+#' @import tsbox
+#' @import distributional
 NULL

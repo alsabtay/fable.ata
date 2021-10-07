@@ -4,8 +4,12 @@
 
 globalVariables(c(".","self", "origin"))
 
-@
-train_ATA <- function(.data, specials, ...){
+
+no_xreg <- function(...) {
+  abort("Exogenous regressors are not supported for ATA method.")
+}
+
+train_ATA <- function(.data, specials, opt_crit, nmse, ic, ...){
   if(length(tsibble::measured_vars(.data)) > 1){
     abort("Only univariate responses are supported by ATA Method")
   }
@@ -15,22 +19,21 @@ train_ATA <- function(.data, specials, ...){
   # Prepare data for modelling
   if (is.ts(.data)){
     model_data = .data
-    period <- frequency(model_data)
+    period <- stats::frequency(model_data)
     if (any(is.na(model_data))) {
       abort("Ata method does not support missing values.")
     }
   }else{
-    model_data <- as_tibble(.data)[c(expr_text(index(.data)), measured_vars(.data))]
+    model_data <- tsibble::as_tibble(.data)[c(rlang::expr_text(index(.data)), measured_vars(.data))]
     colnames(model_data) <- c("ds", "y")
-    if (any(is.na(y))) {
+    if (any(is.na(model_data$y))) {
       abort("Ata method does not support missing values.")
     }
-    period <- get_frequencies(period, .data, .auto = "smallest")
-    pre_data <- ts_ts(model_data$y)
-    model_data <- ts(model_data$y, frequency = period, start=tsp(pre_data)[1])
+    period <- fabletools::get_frequencies(period, .data, .auto = "smallest")
+    pre_data <- tsbox::ts_ts(.data)
+    model_data <- stats::ts(model_data$y, frequency = unname(period), start=tsp(pre_data)[1])
   }
 
-  AutoATA_spec <- specials[c("level", "trend", "season", "transform", "holdout")]
   level <- specials$level
   trend <- specials$trend
   season <- specials$season
@@ -50,19 +53,19 @@ train_ATA <- function(.data, specials, ...){
                   model.type = ifelse(trend$type=="N","A",ifelse(trend$type=="Ad", "A", ifelse(trend$type=="Md","M",trend$type))),
                   seasonal.test = ifelse(season$type=="N", FALSE, season$test),
                   seasonal.model = ifelse(season$type=="N", "none", season$method),
-                  seasonal.period = period,
+                  seasonal.period = unname(period),
                   seasonal.type = ifelse(season$type=="N", "M", season$type),
                   seasonal.test.attr = seas_opt_crit,
                   find.period = NULL,
-                  accuracy.type = NULL,
+                  accuracy.type = opt_crit,
                   nmse = nmse,
                   level.fixed = level$level_fixed,
                   trend.fixed = ifelse(trend$opt_trend=="fixed", TRUE, FALSE),
                   trend.search = ifelse(trend$opt_trend=="search", TRUE, FALSE),
                   h = 1,
-                  partition.h = NULL,
-                  holdout = FALSE,
-                  holdout.adjustedP = TRUE,
+                  partition.h = ifelse(holdout$holdout == TRUE, holdout$set_size, NULL),
+                  holdout = holdout$holdout,
+                  holdout.adjustedP = holdout$adjustedP,
                   holdin = FALSE,
                   transform.order = ifelse(transform$order=="none", "before", transform$order),
                   transform.method = ifelse(transform$method=="none", NULL, transform$method),
@@ -82,9 +85,8 @@ train_ATA <- function(.data, specials, ...){
   # Return model
   structure(
     list(
-        par = tibble(term = names(mdl_ATA$par.specs), estimate = unname(mdl_ATA$par.specs)),
-        est = list(data = mdl_ATA$actual,
-                   .fitted = mdl_ATA$fitted,
+        par = tsibble::tibble(term = names(mdl_ATA$par.specs), estimate = unname(mdl_ATA$par.specs)),
+        est = list(.fitted = mdl_ATA$fitted,
                    .resid = mdl_ATA$residuals),
         fit = mdl_ATA$accuracy$fits,
         components = list(coefp = mdl_ATA$coefp,
@@ -185,16 +187,13 @@ specials_ATA <- fabletools::new_specials(
                         }
                         as.list(environment())
                     },
-   holdout = function(holdout = FALSE, adjustment = TRUE, set_size = c(0,1) ){
-                      if (set_size[1] > set_size[2]) {
-                        abort("Lower holdout set size percentage limits must be less than upper limits")
-                      }
-                      if (min(set_size)<=0 | max(set_size)>1){
-                        abort("Percentage of holdout set size must be higher than 0 and less than 1")
+   holdout = function(holdout = FALSE, adjustment = TRUE, set_size = NULL ){
+                      if (min(set_size)<=0){
+                        abort("Percentage of holdout set size must be higher than 0.")
                       }
                       as.list(environment())
                     },
-   xreg = no_xreg ,
+   xreg_specials = NULL ,
   .required_specials = c("trend", "season")
 )
 
@@ -204,10 +203,10 @@ ATA <- function(formula,
                     opt_crit = "sMAPE",
                     nmse = 3,
                     ic = "AIC", ...){
-        ATA_model <- fabletools::new_model_class("ATA",
+        ATA_model <- fabletools::new_model_class(model = "ATA",
                                                      train = train_ATA,
                                                      specials = specials_ATA,
-                                                     check = all_tsbl_checks
+                                                     check = all_tsbl_checks_ata
                                                      )
         fabletools::new_model_definition(ATA_model,
                                          !!rlang::enquo(formula),
@@ -221,7 +220,6 @@ ATA <- function(formula,
 forecast.fbl_ATA <- function(object, new_data, h=NULL, ci_level=95, negative_forecast=TRUE, ...){
   mdl <- object$model_output
   spec_mdl <- object$spec
-  mdls <- mable_vars(object)
   if(!is.null(h) && !is.null(new_data)){
       warn("Input forecast horizon 'h' will be ignored as 'new_data/test_set' has been provided.")
       h <- nrow(new_data)
@@ -247,13 +245,13 @@ forecast.fbl_ATA <- function(object, new_data, h=NULL, ci_level=95, negative_for
   if (is_tsibble(new_data)){
       test_set <- as_tibble(new_data)[c(expr_text(index(new_data)), measured_vars(new_data))]
       colnames(test_set) <- c("ds", "yh")
-      pre_data <- ts_ts(test_set$yh)
+      pre_data <- ts_ts(new_data)
       test_set <- ts(pre_data, frequency = spec_mdl$period, start=tsp(pre_data)[1])
   }else{
     test_set = new_data
   }
 
-  fc <- ATA.Forecast(mdl, h, test_set, ci_level, negative_forecast)$forecast
+  fc <- ATAforecasting::ATA.Forecast(mdl, h, test_set, ci_level, negative_forecast)$forecast
   # Return forecasts
   distributional::dist_degenerate(fc$forecast)
 }
@@ -306,5 +304,5 @@ format.fbl_ATA <- function(x, ...){
 
 #' @export
 report.fbl_ATA <- function(object, ...) {
-  ATA.print(object$model_output)
+  ATAforecasting::ATA.print(object$model_output)
 }
