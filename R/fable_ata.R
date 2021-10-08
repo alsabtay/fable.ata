@@ -9,12 +9,16 @@ train_ata <- function(.data, specials, ...){
   if(length(tsibble::measured_vars(.data)) > 1){
     stop("Only univariate responses are supported by ATA Method")
   }
-  level <- specials$level
-  trend <- specials$trend
-  season <- specials$season
-  accuracy <- specials$accuracy
-  transform <- specials$transform
-  holdout <- specials$holdout
+  
+  # Allow only one special of each type.
+  # TODO: Add message/warning if more than one of these specials is in formula
+  level <- specials$level[[1]]
+  trend <- specials$trend[[1]]
+  season <- specials$season[[1]]
+  accuracy <- specials$accuracy[[1]]
+  transform <- specials$transform[[1]]
+  holdout <- specials$holdout[[1]]
+  
   # Prepare data for modelling
     model_data <- tsibble::as_tibble(.data)[c(rlang::expr_text(index(.data)), tsibble::measured_vars(.data))]
     colnames(model_data) <- c("ds", "y")
@@ -152,7 +156,8 @@ specials_ata <- fabletools::new_specials(
                     },
    holdout = function(holdout = FALSE, adjustment = TRUE, set_size = NULL ){
                         list("holdout" = holdout, "adjustment" = adjustment, "set_size" = set_size)
-                    }
+                    },
+   .required_specials = c("level", "trend", "season", "accuracy", "transform", "holdout")
 )
 
 #' ATAforecasting: Automatic Time Series Analysis and Forecasting using Ata Method with Box-Cox Power Transformations Family and Seasonal Decomposition Techniques
