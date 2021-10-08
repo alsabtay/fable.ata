@@ -26,8 +26,8 @@ train_ata <- function(.data, specials, ...){
       stop("ATA method does not support missing values.")
     }
     period <- fabletools::get_frequencies(season$period, .data, .auto = "smallest")
-    pre_data <- quietly(tsbox::ts_ts(.data))
-    model_data <- stats::ts(model_data$y, frequency = unname(period), start=tsp(pre_data)[1])
+    pre_data <- quietly(tsbox::ts_ts)(.data)
+    model_data <- stats::ts(model_data$y, frequency = unname(period), start=start(pre_data))
   if (holdout$holdout == TRUE & accuracy$criteria == "AMSE") {
     stop("ATA Method does not support 'AMSE' for 'holdout' forecasting.")
   }
