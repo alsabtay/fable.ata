@@ -1,7 +1,5 @@
-#' @keywords package
+#' @keywords internal
 "_PACKAGE"
-
-globalVariables(c(".","self", "origin"))
 
 #' @import stats
 #' @import fabletools
