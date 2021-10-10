@@ -27,8 +27,7 @@ Depends:
     R (>= 4.0),
     fabletools
 License: GPL (>= 3)
-URL: https://github.com/alsabtay/fable.ata
-        https://atamethod.wordpress.com/
+URL: https://alsabtay.github.io/fable.ata/
 BugReports: https://github.com/alsabtay/fable.ata/issues
 Encoding: UTF-8
 LazyData: true

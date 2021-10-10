@@ -13,14 +13,14 @@ Allows Ata models from the 'ATAforecasting' package to be used in a tidy workflo
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://github.com/alsabtay/fable.ata https://atamethod.wordpress.com/}
+  \item \url{https://alsabtay.github.io/fable.ata/}
   \item Report bugs at \url{https://github.com/alsabtay/fable.ata/issues}
 }
 
 
 Useful links:
 \itemize{
-  \item \url{https://github.com/alsabtay/fable.ata https://atamethod.wordpress.com/}
+  \item \url{https://alsabtay.github.io/fable.ata/}
   \item Report bugs at \url{https://github.com/alsabtay/fable.ata/issues}
 }
 
