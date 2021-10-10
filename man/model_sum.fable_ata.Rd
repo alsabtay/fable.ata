@@ -12,7 +12,7 @@
 \item{...}{Unused.}
 }
 \value{
-The model's summary specs in a `tibble`.
+The model's summary specs.
 }
 \description{
 Summary of ATA model

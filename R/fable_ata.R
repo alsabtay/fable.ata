@@ -3,8 +3,12 @@
 "_PACKAGE"
 
 #' @importFrom ATAforecasting ATA.SeasAttr ATA.BoxCoxAttr ATA
-#' @importFrom tsibble measured_vars as_tibble tibble
-#' @importFrom stats frequency ts
+#' @importFrom tsibble measured_vars as_tibble tibble index
+#' @importFrom rlang expr_text
+#' @importFrom stats frequency ts start
+#' @importFrom fabletools get_frequencies
+#' @importFrom dplyr ungroup
+#'
 train_ata <- function(.data, specials, ...){
   if(length(tsibble::measured_vars(.data)) > 1){
     stop("Only univariate responses are supported by ATA Method")
@@ -20,7 +24,7 @@ train_ata <- function(.data, specials, ...){
   holdout <- specials$holdout[[1]]
 
   # Prepare data for modelling
-    model_data <- tsibble::as_tibble(.data)[c(rlang::expr_text(index(.data)), tsibble::measured_vars(.data))]
+    model_data <- tsibble::as_tibble(.data)[c(rlang::expr_text(tsibble::index(.data)), tsibble::measured_vars(.data))]
     colnames(model_data) <- c("ds", "y")
     if (any(is.na(model_data$y))) {
       stop("ATA method does not support missing values.")
@@ -31,12 +35,12 @@ train_ata <- function(.data, specials, ...){
   if (holdout$holdout == TRUE & accuracy$criteria == "AMSE") {
     stop("ATA Method does not support 'AMSE' for 'holdout' forecasting.")
   }
-  seas_opt_crit <- ATAforecasting::ATA.SeasAttr(suroot.test=season$suroot_test, corrgram.tcrit = season$suroot_tcrit, suroot.uroot = season$suroot_uroot, uroot.pkg="tseries",
-                                uroot.test=trend$uroot_test, uroot.type=trend$uroot_type, uroot.alpha=trend$uroot_alpha, uroot.maxd=1)
+  seas_opt_crit <- ATAforecasting::ATA.SeasAttr(suroot.test=season$suroot_test, corrgram.tcrit = season$suroot_tcrit, suroot.uroot = season$suroot_uroot, suroot.m = season$suroot_m,
+                                uroot.pkg="tseries", uroot.test=trend$uroot_test, uroot.type=trend$uroot_type, uroot.alpha=trend$uroot_alpha, uroot.maxd=1)
   bc_opt_crit <- ATAforecasting::ATA.BoxCoxAttr(bcMethod = transform$bcMethod, bcLower = transform$bcLower, bcUpper = transform$bcUpper)
 
   # Build and train model
-  mdl_ATA <- safely(quietly(ATAforecasting::ATA))(
+  pmdl_ATA <- safely(quietly(ATAforecasting::ATA))(
                   X = model_data,
                   Y = NULL,
                   parP = level$parP,
@@ -45,22 +49,21 @@ train_ata <- function(.data, specials, ...){
                   model.type = ifelse(trend$type=="N","A",ifelse(trend$type=="Ad", "A", ifelse(trend$type=="Md","M",trend$type))),
                   seasonal.test = ifelse(season$type=="N", FALSE, season$test),
                   seasonal.model = ifelse(season$type=="N", "none", season$method),
-                  seasonal.period = unname(period),
+                  seasonal.period = NULL,
                   seasonal.type = ifelse(season$type=="N", "M", season$type),
                   seasonal.test.attr = seas_opt_crit,
                   find.period = NULL,
                   accuracy.type = accuracy$criteria,
                   nmse = accuracy$nmse,
                   level.fixed = level$level_fixed,
-                  trend.fixed = ifelse(trend$opt_trend=="fixed", TRUE, FALSE),
-                  trend.search = ifelse(trend$opt_trend=="search", TRUE, FALSE),
+                  trend.opt = trend$trend_opt,
                   h = 1,
-                  partition.h = ifelse(holdout$holdout == TRUE, holdout$set_size, NULL),
+                  partition.h = switch(holdout$holdout + 1 , NULL, holdout$set_size),
                   holdout = holdout$holdout,
-                  holdout.adjustedP = holdout$adjustedP,
+                  holdout.adjustedP = holdout$adjustment,
                   holdin = FALSE,
-                  transform.order = ifelse(transform$order=="none", "before", transform$order),
-                  transform.method = ifelse(transform$method=="none", NULL, transform$method),
+                  transform.order = ifelse(transform$order == "none", "before", transform$order),
+                  transform.method = switch((transform$method != "none") + 1, NULL, transform$method),
                   transform.attr = bc_opt_crit,
                   lambda = transform$lambda,
                   shift = transform$shift,
@@ -73,22 +76,35 @@ train_ata <- function(.data, specials, ...){
                   negative.forecast = TRUE,
                   print.out = FALSE,
                   plot.out = FALSE)
-
+  mdl_ATA <- pmdl_ATA[["result"]]
+  if(mdl_ATA$q==0){
+    trend_mthd <- "N"
+  }else if (mdl_ATA$q!=0 & mdl_ATA$phi!=1){
+    trend_mthd <- paste(mdl_ATA$model.type, "d", sep="")
+  }else{
+    trend_mthd <- mdl_ATA$model.type
+  }
+  if(mdl_ATA$seasonal.model == "none"){
+    seas_mthd <- "N"
+  }else{
+    seas_mthd <- mdl_ATA$seasonal.type
+  }
   # Return model
   ata_out <-  list(
-        "par" = tsibble::tibble(term = names(mdl_ATA$par.specs), estimate = unname(mdl_ATA$par.specs)),
-        "est" = list(".fitted" = mdl_ATA$fitted,
-                   ".resid" = mdl_ATA$residuals),
+        "par" = tsibble::tibble(term = names(mdl_ATA$par.specs), estimate = unlist(mdl_ATA$par.specs)),
+        "est" = dplyr::mutate(dplyr::ungroup(.data),
+                        ".fitted" = mdl_ATA$fitted,
+                        ".resid" = mdl_ATA$residuals),
         "fit" = mdl_ATA$accuracy$fits,
         "components" = list("coefp" = mdl_ATA$coefp,
                           "coefq" = mdl_ATA$coefp,
-                          "P" = mdl_ATA$parP,
-                          "Q" = mdl_ATA$parQ,
-                          "PHI" = mdl_ATA$parPHI,
+                          "P" = mdl_ATA$p,
+                          "Q" = mdl_ATA$q,
+                          "PHI" = mdl_ATA$phi,
                           "response" = mdl_ATA$actual,
                           "level" = mdl_ATA$level,
                           "trend" = mdl_ATA$trend,
-                          "seasonal" = mdl_ATA$seasonal,
+                          "season" = mdl_ATA$seasonal,
                           "seasindex" = mdl_ATA$seasonal.index,
                           "seasadj" = mdl_ATA$seasonal.adjusted,
                           "remainder" = mdl_ATA$residuals),
@@ -97,11 +113,11 @@ train_ata <- function(.data, specials, ...){
                          "lambda" = mdl_ATA$lambda,
                          "shift" = mdl_ATA$shift),
         "holdout" = list("holdout" = mdl_ATA$holdout,
-                       "adjustment" = mdl_ATA$holdout.adjustedP),
+                       "adjustment" = holdout$adjustment),
         "spec" = list("errortype" = "A",
-                 "trendtype" = mdl_ATA$model.type,
-                 "seasontype" = mdl_ATA$seasonal.model,
-                 "damped" = ifelse(mdl_ATA$parPHI==1, FALSE, TRUE),
+                 "trendtype" = trend_mthd,
+                 "seasontype" = seas_mthd,
+                 "damped" = ifelse(mdl_ATA$phi==1, FALSE, TRUE),
                  "period" = mdl_ATA$seasonal.period,
                  "method" = mdl_ATA$method),
         "model_output" = mdl_ATA)
@@ -112,31 +128,32 @@ specials_ata <- fabletools::new_specials(
    level = function(parP= NULL, level_fixed = FALSE, initial_level = FALSE){
                    list("parP" = parP, "level_fixed" = level_fixed, "initial_level" = initial_level)
                   },
-   trend = function(type = "A", parQ = NULL, initial_trend = FALSE, opt_trend = "none",
+   trend = function(type = "A", parQ = NULL, initial_trend = FALSE, trend_opt = "none",
                    parPHI = NULL, parPHI_range = c(0.8, 1.0), parPHI_increment = 0.01,
                    uroot_test = "adf", uroot_alpha = 0.05, uroot_type = "level")
                    {
-
                      if (type == "N"){
                        parQ = 0
+                       parPHI = 1
                        warning("Q has been set 0 because of no trend option.")
                      }
                      if (type == "Ad" | type == "Md"){
                        parPHI = NULL
                        warning("PHI has been set NULL as damped trend is choosen.")
                      }
-                     list("type" = type, "parQ" = parQ, "initial_trend" = initial_trend,
+                     list("type" = type, "parQ" = parQ, "initial_trend" = initial_trend, "trend_opt" = trend_opt,
                           "parPHI" = parPHI, "parPHI_range" = parPHI_range, "parPHI_increment" = parPHI_increment,
                           "uroot_test" = uroot_test, "uroot_alpha" = uroot_alpha, "uroot_type" = uroot_type)
                   },
    season = function(type = "A", test = TRUE, period = NULL, method = "decomp",
-                  suroot_test = "correlogram", suroot_tcrit = 1.28, suroot_uroot = TRUE)
+                  suroot_test = "correlogram", suroot_tcrit = 1.28, suroot_uroot = TRUE, suroot_m = NULL)
                   {
                     if (type == "N") {
                       period <- 1
+                      method = "none"
                     }
                     list("type" = type, "test" = test, "period" = period, "method" = method,
-                          "suroot_test" = suroot_test, "suroot_tcrit" = suroot_tcrit, "suroot_uroot" = suroot_uroot)
+                          "suroot_test" = suroot_test, "suroot_tcrit" = suroot_tcrit, "suroot_uroot" = suroot_uroot, "suroot_m" = suroot_m)
                   },
    accuracy = function(criteria="sMAPE", nmse = 3, ic = "AIC"){
                      if (nmse > 30 & criteria == "AMSE") {
@@ -214,7 +231,7 @@ specials_ata <- fabletools::new_specials(
 #'   `parPHI_range`       \tab If `phi=NULL`, `phi_range` provides bounds for the optimised value of `phi`.\cr
 #'   `parPHI_increment`  \tab If `phi=NULL`, `parPHI_increment` provides increment step for searching `phi`. If NULL, `parPHI_increment` will be determined as the value that allows the `parPHI_range` to be divided into 20 equal parts. \cr
 #'   `initial_trend`        \tab If NULL, FALSE is default. If FALSE, ATA Method calculates the qth observation in \code{X(T)-X(T-1)} for trend. If TRUE, ATA Method calculates average of first q value in \code{X(T)-X(T-1)} for trend. \cr
-#'   `opt_trend`        \tab The value of the dampening parameter for the slope. If `phi = 0`, the slope will be dampened immediately (no slope). Conversely, if `phi = 1` the slope will not be dampened. \cr
+#'   `trend_opt`        \tab Default is `none`. If `fixed` is set, "pBullet" --> Fits ATA(p,1) where p = p* is optimized for q = 1. If `search` is set "qBullet" --> Fits ATA(p,q) where p = p* is optimized for q = q* (q > 0). Then, fits ATA(p*,q) where q is optimized for p = p*. \cr
 #'   `uroot_test`        \tab Type of unit root test before all type seasonality test. Possible values are "adf", "pp" and "kpss". \cr
 #'   `uroot_alpha`   \tab Significant level of the unit root test, possible values range from 0.01 to 0.1. \cr
 #'   `uroot_type`        \tab Specification of the deterministic component in the regression for unit root test. Possible values are "level" and "trend". \cr
@@ -225,7 +242,7 @@ specials_ata <- fabletools::new_specials(
 #' The `season` special is used to specify the form of the seasonal term and associated parameters. To specify a nonseasonal model you would include `season(method = "N")`.
 #' \preformatted{
 #' season(type = "A", test = TRUE, period = NULL, method = "decomp",
-#'        suroot_test = "correlogram", suroot_tcrit = 1.28, suroot_uroot = TRUE)
+#'        suroot_test = "correlogram", suroot_tcrit = 1.28, suroot_uroot = TRUE, suroot_m = NULL)
 #' }
 #' \tabular{ll}{
 #'   `type`     \tab The form of the seasonal term: either none ("N"), additive ("A") or multiplicative ("M"). \cr
@@ -235,6 +252,7 @@ specials_ata <- fabletools::new_specials(
 #'   `suroot_test`     \tab Type of seasonal unit root test to use. Possible values are "correlogram", "seas", "hegy", "ch" and "ocsb". \cr
 #'   `suroot_tcrit`     \tab t-value for autocorrelogram.  \cr
 #'   `suroot_uroot`     \tab If TRUE, unit root test for stationary before seasonal unit root test is allowed. \cr
+#'   `suroot.m`      \tab Deprecated. Length of seasonal period: frequency of data for nsdiffs.
 #' }
 #' }
 #'
@@ -261,10 +279,10 @@ ATAM <- function(formula, ...){
 #'
 #' @return A vector of fitted residuals.
 #'
-#' @importFrom tsibble is_tsibble as_tibble measured_vars
+#' @importFrom tsibble is_tsibble as_tibble measured_vars index
 #' @importFrom rlang enquo expr_text
 #' @importFrom tsbox ts_ts
-#' @importFrom stats tsp ts
+#' @importFrom stats frequency ts start
 #' @importFrom ATAforecasting ATA.Forecast
 #' @importFrom distributional dist_degenerate
 #'
@@ -272,38 +290,38 @@ ATAM <- function(formula, ...){
 forecast.fable_ata <- function(object, new_data, h=NULL, ci_level=95, negative_forecast=TRUE, ...){
   mdl <- object$model_output
   spec_mdl <- object$spec
-  if(!is.null(h) && !is.null(new_data)){
-      warning("Input forecast horizon 'h' will be ignored as 'new_data/test_set' has been provided.")
-      h <- nrow(new_data)
-  }
-  if (is.null(h)){
-    if (spec_mdl$period==4){
-      h <- 8
-    }else if (spec_mdl$period==5){
-      h <- 10
-    }else if (spec_mdl$period==7){
-      h <- 14
-    }else if (spec_mdl$period==12){
-      h <- 24
-    }else if (spec_mdl$period==24){
-      h <- 48
-    }else {
-      h <- 6
-    }
-    warning(paste("Input forecast horizon has been changed with ", h))
-  }
-
-  # Prepare data
-  if (tsibble::is_tsibble(new_data)){
-      test_set <- tsibble::as_tibble(new_data)[c(rlang::expr_text(index(new_data)), tsibble::measured_vars(new_data))]
-      colnames(test_set) <- c("ds", "yh")
-      pre_data <- ts_ts(new_data)
-      test_set <- stats::ts(pre_data, frequency = spec_mdl$period, start=tsp(pre_data)[1])
+  if(missing(new_data)){
+    mh <- h
   }else{
-    test_set = new_data
+    mh <- nrow(new_data)
+  }
+  if (is.null(mh)){
+    if (spec_mdl$period==4){
+      mh <- 8
+    }else if (spec_mdl$period==5){
+      mh <- 10
+    }else if (spec_mdl$period==7){
+      mh <- 14
+    }else if (spec_mdl$period==12){
+      mh <- 24
+    }else if (spec_mdl$period==24){
+      mh <- 48
+    }else {
+      mh <- 6
+    }
   }
 
-  fc <- safely(quietly(ATAforecasting::ATA.Forecast))(mdl, h, test_set, ci_level, negative_forecast)
+# Prepare data and forecast
+ if (length(tsibble::measured_vars(new_data)) == 0){
+    pfc <- safely(quietly(ATAforecasting::ATA.Forecast))(mdl, h = mh, ci.level = ci_level, negative.forecast = negative_forecast, print.out = FALSE)
+ }else {
+  test_set <- tsibble::as_tibble(new_data)[c(rlang::expr_text(tsibble::index(new_data)), tsibble::measured_vars(new_data))]
+  colnames(test_set) <- c("ds", "yh")
+  pre_data <- quietly(tsbox::ts_ts)(new_data)
+  test_set <- stats::ts(pre_data, frequency = spec_mdl$period, start = start(pre_data))
+  pfc <- safely(quietly(ATAforecasting::ATA.Forecast))(mdl, h, test_set, ci_level, negative_forecast, print.out = FALSE)
+ }
+  fc <- pfc[["result"]]
   # Return forecasts
   distributional::dist_degenerate(fc$forecast)
 }
@@ -345,19 +363,63 @@ residuals.fable_ata <- function(object, ...){
 #' @return A [fabletools::dable()] containing estimated states.
 #'
 #' @importFrom fabletools as_dable
-#' @importFrom rlang sym
+#' @importFrom rlang sym expr list2
+#' @importFrom tsibble measured_vars index
+#' @importFrom dplyr transmute mutate select
 #'
 #' @export
 components.fable_ata <- function(object, ...){
   cmp <- object$components
-  three_cmp <- list("level" = cmp$level, "trend" = cmp$trend, "remainder" = cmp$remainder)
-  seas_cmp <- cmp$seasonal
-  fabletools::as_dable(cmp,
-            resp = !!sym(response),
-            method = model_sum(object),
-            seasons = seas_cmp,
-            aliases = three_cmp
-           )
+  spec <- object$spec
+  response <- tsibble::measured_vars(object$est)[[1]]
+  est_vars <- dplyr::transmute(object$est,
+                        !!rlang::sym(response),
+                        remainder = !!rlang::sym(".resid")
+                       )
+  idx <- tsibble::index(est_vars)
+  eqn <- rlang::expr(!!rlang::sym("level"))
+  if (spec$trendtype == "A") {
+      eqn <- rlang::expr(!!eqn + !!rlang::sym("trend"))
+  } else if (spec$trendtype == "M") {
+      eqn <- rlang::expr(!!eqn * !!rlang::sym("trend"))
+  }
+  if (spec$seasontype == "A") {
+    eqn <- rlang::expr(!!eqn + !!rlang::sym("season"))
+  } else if (spec$seasontype == "M") {
+    eqn <- rlang::expr((!!eqn) * !!rlang::sym("season"))
+  }
+  eqn <- rlang::expr(!!eqn + !!rlang::sym("remainder"))
+  if (spec$trendtype == "N" & spec$seasontype != "N"){
+    f_cmp <- dplyr::mutate(dplyr::ungroup(est_vars),
+                            "level" = cmp$level,
+                            "season" = cmp$season)
+    f_cmp <- dplyr::select(f_cmp, intersect(c(idx, response, "level", "season", "remainder"), colnames(f_cmp)))
+    seasonality <- list("season" = cmp$season)
+  } else if (spec$trendtype != "N" & spec$seasontype == "N"){
+    f_cmp <- dplyr::mutate(dplyr::ungroup(est_vars),
+                            "level" = cmp$level,
+                            "trend" = cmp$trend)
+    f_cmp <- dplyr::select(f_cmp, intersect(c(idx, response, "level", "trend", "remainder"), colnames(f_cmp)))
+    seasonality <- list()
+  }else if (spec$trendtype == "N" & spec$seasontype == "N") {
+    f_cmp <- dplyr::mutate(dplyr::ungroup(est_vars),
+                            "level" = cmp$level)
+    f_cmp <- dplyr::select(f_cmp, intersect(c(idx, response, "level", "remainder"), colnames(f_cmp)))
+    seasonality <- list()
+  }else {
+    f_cmp <- dplyr::mutate(dplyr::ungroup(est_vars),
+                            "level" = cmp$level,
+                            "trend" = cmp$trend,
+                            "season" = cmp$season)
+    f_cmp <- dplyr::select(f_cmp, intersect(c(idx, response, "level", "trend", "season", "remainder"), colnames(f_cmp)))
+    seasonality <- list("season" = cmp$season)
+  }
+
+  fabletools::as_dable(f_cmp,
+                       resp = !!rlang::sym(response),
+                       method = model_sum(object),
+                       seasons = seasonality,
+                       aliases = rlang::list2(!!response := eqn))
 }
 
 #' Glance an ATA model
@@ -367,9 +429,11 @@ components.fable_ata <- function(object, ...){
 #'
 #' @return A one row tibble summarising the model's fit.
 #'
+#' @importFrom tibble as_tibble
+#'
 #' @export
 glance.fable_ata <- function(x, ...){
-  x$fit
+  tibble::as_tibble(x$fit)
 }
 
 #' Tidy a ATA model
@@ -389,11 +453,11 @@ tidy.fable_ata <- function(x, ...){
 #' @param x An estimated model.
 #' @param ... Unused.
 #'
-#' @return The model's summary specs in a `tibble`.
+#' @return The model's summary specs.
 #'
 #' @export
 model_sum.fable_ata <- function(x, ...){
-  x$spec[["method"]]
+  x$spec$method
 }
 
 #' Format of ATA model
@@ -413,10 +477,9 @@ format.fable_ata <- function(x, ...){
 #'
 #' @export
 report.fable_ata <- function(object, ...) {
-  x <- object$model_output
-  opscipen <- options("scipen" = 100, "digits"=7)
+    opscipen <- options("scipen" = 100, "digits"=7)
     on.exit(options(opscipen))
-	x <- object
+	  x <- object$model_output
     cat(x$method,"\n\n")
     if (x$level.fixed==TRUE){
       cat("   level.fixed: TRUE","\n\n")
@@ -477,16 +540,4 @@ report.fable_ata <- function(object, ...) {
     cat("\n")
     print(stats)
     cat("\n")
-
-    stats <- c(x$execution.time[1], x$execution.time[2], x$execution.time[3])
-    names(stats) <- c("user","system","elapsed")
-    cat("\n")
-    print(stats)
-    cat("\n")
-    cat(paste("calculation.time:",x$calculation.time, "\n\n"))
-    cat("\n")
-
-    cat("Forecasts:","\n")
-    print(x$forecast)
-    cat("\n\n")
 }

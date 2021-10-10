@@ -65,7 +65,7 @@ trend(type = "A", parQ = NULL, initial_trend = FALSE, opt_trend = "none",
   `parPHI_range`       \tab If `phi=NULL`, `phi_range` provides bounds for the optimised value of `phi`.\cr
   `parPHI_increment`  \tab If `phi=NULL`, `parPHI_increment` provides increment step for searching `phi`. If NULL, `parPHI_increment` will be determined as the value that allows the `parPHI_range` to be divided into 20 equal parts. \cr
   `initial_trend`        \tab If NULL, FALSE is default. If FALSE, ATA Method calculates the qth observation in \code{X(T)-X(T-1)} for trend. If TRUE, ATA Method calculates average of first q value in \code{X(T)-X(T-1)} for trend. \cr
-  `opt_trend`        \tab The value of the dampening parameter for the slope. If `phi = 0`, the slope will be dampened immediately (no slope). Conversely, if `phi = 1` the slope will not be dampened. \cr
+  `trend_opt`        \tab Default is `none`. If `fixed` is set, "pBullet" --> Fits ATA(p,1) where p = p* is optimized for q = 1. If `search` is set "qBullet" --> Fits ATA(p,q) where p = p* is optimized for q = q* (q > 0). Then, fits ATA(p*,q) where q is optimized for p = p*. \cr
   `uroot_test`        \tab Type of unit root test before all type seasonality test. Possible values are "adf", "pp" and "kpss". \cr
   `uroot_alpha`   \tab Significant level of the unit root test, possible values range from 0.01 to 0.1. \cr
   `uroot_type`        \tab Specification of the deterministic component in the regression for unit root test. Possible values are "level" and "trend". \cr
@@ -76,7 +76,7 @@ trend(type = "A", parQ = NULL, initial_trend = FALSE, opt_trend = "none",
 The `season` special is used to specify the form of the seasonal term and associated parameters. To specify a nonseasonal model you would include `season(method = "N")`.
 \preformatted{
 season(type = "A", test = TRUE, period = NULL, method = "decomp",
-       suroot_test = "correlogram", suroot_tcrit = 1.28, suroot_uroot = TRUE)
+       suroot_test = "correlogram", suroot_tcrit = 1.28, suroot_uroot = TRUE, suroot_m = NULL)
 }
 \tabular{ll}{
   `type`     \tab The form of the seasonal term: either none ("N"), additive ("A") or multiplicative ("M"). \cr
@@ -86,6 +86,7 @@ season(type = "A", test = TRUE, period = NULL, method = "decomp",
   `suroot_test`     \tab Type of seasonal unit root test to use. Possible values are "correlogram", "seas", "hegy", "ch" and "ocsb". \cr
   `suroot_tcrit`     \tab t-value for autocorrelogram.  \cr
   `suroot_uroot`     \tab If TRUE, unit root test for stationary before seasonal unit root test is allowed. \cr
+  `suroot.m`      \tab Deprecated. Length of seasonal period: frequency of data for nsdiffs.
 }
 }
 }

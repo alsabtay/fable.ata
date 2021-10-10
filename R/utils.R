@@ -1,7 +1,3 @@
-add_class <- function(x, class) {
-  `class<-`(x, c(class, class(x)))
-}
-
 capture_error <- function(code, otherwise = NULL, quiet = TRUE) {
   tryCatch(list(result = code, error = NULL), error = function(e) {
     if (!quiet) {

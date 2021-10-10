@@ -2,7 +2,7 @@ Package: fable.ata
 Type: Package
 Title: Fable Modelling Wrappers for ATAforecasting Package
 Version: 0.0.1
-Date: 2021-10-08
+Date: 2021-10-10
 Authors@R: c(
   person("Ali Sabri", "Taylan", email="alisabritaylan@gmail.com", role=c("aut", "cre", "cph"), comment = c(ORCID = "0000-0001-9514-934X")),
   person("Hanife", "Taylan Selamlar", role=c("aut", "cph"), comment = c(ORCID = "0000-0002-4091-884X")),
@@ -18,6 +18,8 @@ Imports:
     stats,
     ATAforecasting,
     rlang,
+    tibble,
+    dplyr,
     tsibble,
     distributional,
     tsbox
