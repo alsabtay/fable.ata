@@ -16,3 +16,13 @@ You can install the **development** version from
 # install.packages("remotes")
 remotes::install_github("alsabtay/fable.ata")
 ```
+
+## Example
+
+
+USAccDeaths: Accidental Deaths in the US 1973--1978
+
+``` r
+library(fable.ata)
+as_tsibble(USAccDeaths) %>% model(ata = ATAM(value ~ trend("A") + season("A", method = "stl"))) %>% forecas(h=24)
+``` 
