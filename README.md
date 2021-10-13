@@ -24,5 +24,5 @@ USAccDeaths: Accidental Deaths in the US 1973--1978
 
 ``` r
 library(fable.ata)
-as_tsibble(USAccDeaths) %>% model(ata = ATAM(value ~ trend("A") + season("A", method = "stl"))) %>% forecas(h=24)
+as_tsibble(USAccDeaths) %>% model(ata = ATAM(value ~ trend("A") + season("A", method = "stl"))) %>% forecast(h=24)
 ``` 
