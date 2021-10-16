@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Summary of ATA model — model_sum.fable_ata • fable.ata</title>
+<title>Extract model residuals — residuals.ATA • fable.ata</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Summary of ATA model — model_sum.fable_ata" />
-<meta property="og:description" content="Summary of ATA model" />
+<meta property="og:title" content="Extract model residuals — residuals.ATA" />
+<meta property="og:description" content="Extracts the residuals from an estimated ATA model." />
 
 
 
@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">fable.ata</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.2</span>
       </span>
     </div>
 
@@ -108,23 +108,23 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Summary of ATA model</h1>
+    <h1>Extract model residuals</h1>
     <small class="dont-index">Source: <a href='https://github.com/alsabtay/fable.ata/blob/master/R/fable_ata.R'><code>R/fable_ata.R</code></a></small>
-    <div class="hidden name"><code>model_sum.fable_ata.Rd</code></div>
+    <div class="hidden name"><code>residuals.ATA.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Summary of ATA model</p>
+    <p>Extracts the residuals from an estimated ATA model.</p>
     </div>
 
-    <pre class="usage"><span class='co'># S3 method for fable_ata</span>
-<span class='fu'>model_sum</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>...</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='co'># S3 method for ATA</span>
+<span class='fu'><a href='https://rdrr.io/r/stats/residuals.html'>residuals</a></span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>x</th>
+      <th>object</th>
       <td><p>An estimated model.</p></td>
     </tr>
     <tr>
@@ -135,7 +135,7 @@
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>The model's summary specs.</p>
+    <p>A vector of residuals.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

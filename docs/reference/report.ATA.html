@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Extract estimated states from an ATA model. — components.fable_ata • fable.ata</title>
+<title>Specialized Screen Print Function of ATA model — report.ATA • fable.ata</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Extract estimated states from an ATA model. — components.fable_ata" />
-<meta property="og:description" content="Extract estimated states from an ATA model." />
+<meta property="og:title" content="Specialized Screen Print Function of ATA model — report.ATA" />
+<meta property="og:description" content="Specialized Screen Print Function of ATA model" />
 
 
 
@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">fable.ata</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.2</span>
       </span>
     </div>
 
@@ -108,17 +108,17 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Extract estimated states from an ATA model.</h1>
+    <h1>Specialized Screen Print Function of ATA model</h1>
     <small class="dont-index">Source: <a href='https://github.com/alsabtay/fable.ata/blob/master/R/fable_ata.R'><code>R/fable_ata.R</code></a></small>
-    <div class="hidden name"><code>components.fable_ata.Rd</code></div>
+    <div class="hidden name"><code>report.ATA.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Extract estimated states from an ATA model.</p>
+    <p>Specialized Screen Print Function of ATA model</p>
     </div>
 
-    <pre class="usage"><span class='co'># S3 method for fable_ata</span>
-<span class='fu'>components</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='co'># S3 method for ATA</span>
+<span class='fu'>report</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -133,10 +133,60 @@
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A [fabletools::dable()] containing estimated states.</p>
-
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'>  <span class='fu'>as_tsibble</span><span class='op'>(</span><span class='va'>USAccDeaths</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='fu'>model</span><span class='op'>(</span>ata <span class='op'>=</span> <span class='fu'><a href='AutoATA.html'>AutoATA</a></span><span class='op'>(</span><span class='va'>value</span> <span class='op'>~</span> <span class='fu'>trend</span><span class='op'>(</span><span class='st'>"A"</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'>season</span><span class='op'>(</span><span class='st'>"M"</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='fu'>report</span><span class='op'>(</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; Series: value 
+#&gt; Model: ATA(14,1,0.8) (A,Ad,M) 
+#&gt; ATA(14,1,0.8) (A,Ad,M) 
+#&gt; 
+#&gt;    model.type: A 
+#&gt; 
+#&gt;    seasonal.model: decomp 
+#&gt; 
+#&gt;    seasonal.type: M 
+#&gt; 
+#&gt;    forecast horizon: 1 
+#&gt; 
+#&gt;    accuracy.type: sMAPE 
+#&gt; 
+#&gt; In-Sample Accuracy Measures: 
+#&gt; 
+#&gt;         sigma2         loglik            MAE            MSE           RMSE 
+#&gt; 72185.21147405  -553.00959900   200.57045073 66085.05275793   257.07013198 
+#&gt;            MPE           MAPE          sMAPE           MASE            OWA 
+#&gt;     0.09019897     2.26214497     2.26541088     0.02282915             NA 
+#&gt; 
+#&gt; In-Sample Accuracy Measures: 
+#&gt; 
+#&gt;           MdAE           MdSE          RMdSE           MdPE          MdAPE 
+#&gt;   184.68577277 34108.83466185   184.68577277    -0.00747289     2.00840434 
+#&gt;         sMdAPE 
+#&gt;     2.02877737 
+#&gt; 
+#&gt; Out-Sample Accuracy Measures: 
+#&gt; 
+#&gt;   MAE   MSE  RMSE   MPE  MAPE sMAPE  MASE   OWA 
+#&gt;    NA    NA    NA    NA    NA    NA    NA    NA 
+#&gt; 
+#&gt; Out-Sample Accuracy Measures: 
+#&gt; 
+#&gt;   MdAE   MdSE  RMdSE   MdPE  MdAPE sMdAPE 
+#&gt;     NA     NA     NA     NA     NA     NA 
+#&gt; 
+#&gt; Information Criteria: 
+#&gt; 
+#&gt;      AIC     AICc      BIC 
+#&gt; 1120.019 1121.769 1135.956 
+#&gt; 
+#&gt; 
+#&gt;    user  system elapsed 
+#&gt;   0.159   0.023   0.187 
+#&gt; 
+#&gt; calculation.time: 0.1865 
+#&gt; 
+#&gt; </div><div class='input'>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

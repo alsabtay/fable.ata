@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Forecast a model from the fable ATA model — forecast.fable_ata • fable.ata</title>
+<title>Tidy a ATA model — tidy.ATA • fable.ata</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Forecast a model from the fable ATA model — forecast.fable_ata" />
-<meta property="og:description" content="Forecast a model from the fable ATA model" />
+<meta property="og:title" content="Tidy a ATA model — tidy.ATA" />
+<meta property="og:description" content="Tidy a ATA model" />
 
 
 
@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">fable.ata</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.2</span>
       </span>
     </div>
 
@@ -108,58 +108,51 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Forecast a model from the fable ATA model</h1>
+    <h1>Tidy a ATA model</h1>
     <small class="dont-index">Source: <a href='https://github.com/alsabtay/fable.ata/blob/master/R/fable_ata.R'><code>R/fable_ata.R</code></a></small>
-    <div class="hidden name"><code>forecast.fable_ata.Rd</code></div>
+    <div class="hidden name"><code>tidy.ATA.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Forecast a model from the fable ATA model</p>
+    <p>Tidy a ATA model</p>
     </div>
 
-    <pre class="usage"><span class='co'># S3 method for fable_ata</span>
-<span class='fu'>forecast</span><span class='op'>(</span>
-  <span class='va'>object</span>,
-  <span class='va'>new_data</span>,
-  h <span class='op'>=</span> <span class='cn'>NULL</span>,
-  ci_level <span class='op'>=</span> <span class='fl'>95</span>,
-  negative_forecast <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  <span class='va'>...</span>
-<span class='op'>)</span></pre>
+    <pre class="usage"><span class='co'># S3 method for ATA</span>
+<span class='fu'>tidy</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>object</th>
-      <td><p>The time series model used to produce the forecasts</p></td>
-    </tr>
-    <tr>
-      <th>new_data</th>
-      <td><p>A `tsibble` containing future information used to forecast.</p></td>
-    </tr>
-    <tr>
-      <th>h</th>
-      <td><p>The forecast horison (can be used instead of `new_data` for regular time series with no exogenous regressors).</p></td>
-    </tr>
-    <tr>
-      <th>ci_level</th>
-      <td><p>Confidence Interval levels for forecasting. Default value is 95.</p></td>
-    </tr>
-    <tr>
-      <th>negative_forecast</th>
-      <td><p>Negative values are allowed for forecasting. Default value is TRUE. If FALSE, all negative values for forecasting are set to 0.</p></td>
+      <th>x</th>
+      <td><p>An estimated model.</p></td>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>Other arguments</p></td>
+      <td><p>Unused.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A vector of fitted residuals.</p>
+    <p>The model's coefficients in a `tibble`.</p>
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='fu'>as_tsibble</span><span class='op'>(</span><span class='va'>USAccDeaths</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+  <span class='fu'>model</span><span class='op'>(</span>ata <span class='op'>=</span> <span class='fu'><a href='AutoATA.html'>AutoATA</a></span><span class='op'>(</span><span class='va'>value</span> <span class='op'>~</span> <span class='fu'>trend</span><span class='op'>(</span><span class='st'>"A"</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'>season</span><span class='op'>(</span><span class='st'>"M"</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='fu'>tidy</span><span class='op'>(</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span style='color: #949494;'># A tibble: 9 × 3</span>
+#&gt;   .model term          estimate
+#&gt;   <span style='color: #949494; font-style: italic;'>&lt;chr&gt;</span>  <span style='color: #949494; font-style: italic;'>&lt;chr&gt;</span>         <span style='color: #949494; font-style: italic;'>&lt;chr&gt;</span>   
+#&gt; <span style='color: #BCBCBC;'>1</span> ata    p             14      
+#&gt; <span style='color: #BCBCBC;'>2</span> ata    q             1       
+#&gt; <span style='color: #BCBCBC;'>3</span> ata    phi           0.8     
+#&gt; <span style='color: #BCBCBC;'>4</span> ata    trend         Ad      
+#&gt; <span style='color: #BCBCBC;'>5</span> ata    seasonal      M       
+#&gt; <span style='color: #BCBCBC;'>6</span> ata    period        12      
+#&gt; <span style='color: #BCBCBC;'>7</span> ata    decomp_model  decomp  
+#&gt; <span style='color: #BCBCBC;'>8</span> ata    initial_level <span style='color: #BB0000;'>NA</span>      
+#&gt; <span style='color: #BCBCBC;'>9</span> ata    initial_trend <span style='color: #BB0000;'>NA</span>      </div><div class='input'>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
