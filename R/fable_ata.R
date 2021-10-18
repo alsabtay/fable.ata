@@ -35,7 +35,7 @@ train_ata <- function(.data, specials, ...){
     period <- fabletools::get_frequencies(season$period, .data, .auto = "largest")
   }
   pre_data <- quietly(tsbox::ts_ts)(.data)
-  train_data <- stats::ts(model_data$y, start=start(pre_data), frequency = unname(period))
+  train_data <- stats::ts(model_data$y, start=start(pre_data), frequency = max(unname(period)))
   if (holdout$holdout == TRUE & accuracy$criteria == "AMSE") {
     stop("ATA Method does not support 'AMSE' for 'holdout' forecasting.")
   }
@@ -98,7 +98,7 @@ train_ata <- function(.data, specials, ...){
   }
   # Return model
   ata_out <-  list(
-    "par" = tsibble::tibble(term = names(mdl_ATA$par.specs), estimate = unlist(mdl_ATA$par.specs)),
+    "par" = tsibble::tibble(term = names(unlist(mdl_ATA$par.specs)), estimate = unlist(mdl_ATA$par.specs)),
     "est" = dplyr::mutate(dplyr::ungroup(.data),
                           ".fitted" = mdl_ATA$fitted,
                           ".resid" = mdl_ATA$residuals),
