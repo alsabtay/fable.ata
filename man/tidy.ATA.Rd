@@ -18,6 +18,7 @@ The model's coefficients in a `tibble`.
 Tidy a ATA model
 }
 \examples{
+library(fable.ata)
 as_tsibble(USAccDeaths) \%>\%
   model(ata = AutoATA(value ~ trend("A") + season("M"))) \%>\% tidy()
 

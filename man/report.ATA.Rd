@@ -15,6 +15,7 @@
 Specialized Screen Print Function of ATA model
 }
 \examples{
-  as_tsibble(USAccDeaths) \%>\% model(ata = AutoATA(value ~ trend("A") + season("M"))) \%>\% report()
+ library(fable.ata)
+ as_tsibble(USAccDeaths) \%>\% model(ata = AutoATA(value ~ trend("A") + season("M"))) \%>\% report()
 
 }

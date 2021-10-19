@@ -138,6 +138,7 @@ holdout(holdout = FALSE, adjustment = TRUE, set_size = NULL)
 }
 
 \examples{
+library(fable.ata)
 as_tsibble(USAccDeaths) \%>\% model(ata = AutoATA(value ~ trend("A") + season("A")))
 
 }

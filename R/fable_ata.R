@@ -321,6 +321,7 @@ specials_ata <- fabletools::new_specials(
 #' @importFrom rlang enquo
 #'
 #'@examples
+#' library(fable.ata)
 #' as_tsibble(USAccDeaths) %>% model(ata = AutoATA(value ~ trend("A") + season("A")))
 #'
 #' @export
@@ -342,6 +343,7 @@ AutoATA <- function(formula, ...){
 #' @return A vector of fitted residuals.
 #'
 #' @examples
+#' library(fable.ata)
 #' as_tsibble(USAccDeaths) %>%
 #'   model(ata = AutoATA(value ~ trend("A") + season("M"))) %>% forecast(h=24)
 #'
@@ -429,6 +431,7 @@ residuals.ATA <- function(object, ...){
 #' @return A [fabletools::dable()] containing estimated states.
 #'
 #' @examples
+#' library(fable.ata)
 #' as_tsibble(USAccDeaths) %>%
 #'   model(ata = AutoATA(value ~ trend("A") + season("A"))) %>% components()
 #'
@@ -500,6 +503,7 @@ components.ATA <- function(object, ...){
 #' @return A one row tibble summarising the model's fit.
 #'
 #' @examples
+#' library(fable.ata)
 #' as_tsibble(USAccDeaths) %>%
 #'   model(ata = AutoATA(value ~ trend("A") + season("M"))) %>% glance()
 #'
@@ -517,7 +521,8 @@ glance.ATA <- function(x, ...){
 #'
 #' @return The model's coefficients in a `tibble`.
 #'
-#'@examples
+#' @examples
+#' library(fable.ata)
 #' as_tsibble(USAccDeaths) %>%
 #'   model(ata = AutoATA(value ~ trend("A") + season("M"))) %>% tidy()
 #'
@@ -553,8 +558,9 @@ format.ATA <- function(x, ...){
 #' @param object An estimated model.
 #' @param ... Unused.
 #'
-#'@examples
-#'   as_tsibble(USAccDeaths) %>% model(ata = AutoATA(value ~ trend("A") + season("M"))) %>% report()
+#' @examples
+#'  library(fable.ata)
+#'  as_tsibble(USAccDeaths) %>% model(ata = AutoATA(value ~ trend("A") + season("M"))) %>% report()
 #'
 #' @export
 report.ATA <- function(object, ...) {

@@ -18,6 +18,7 @@ A one row tibble summarising the model's fit.
 Glance an ATA model
 }
 \examples{
+library(fable.ata)
 as_tsibble(USAccDeaths) \%>\%
   model(ata = AutoATA(value ~ trend("A") + season("M"))) \%>\% glance()
 

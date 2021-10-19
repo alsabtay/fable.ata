@@ -33,6 +33,7 @@ A vector of fitted residuals.
 Forecast a model from the fable ATA model
 }
 \examples{
+library(fable.ata)
 as_tsibble(USAccDeaths) \%>\%
   model(ata = AutoATA(value ~ trend("A") + season("M"))) \%>\% forecast(h=24)
 

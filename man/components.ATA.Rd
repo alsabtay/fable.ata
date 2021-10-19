@@ -18,6 +18,7 @@ A [fabletools::dable()] containing estimated states.
 Extract estimated states from an ATA model.
 }
 \examples{
+library(fable.ata)
 as_tsibble(USAccDeaths) \%>\%
   model(ata = AutoATA(value ~ trend("A") + season("A"))) \%>\% components()
 
