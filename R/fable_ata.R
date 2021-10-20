@@ -153,7 +153,7 @@ specials_ata <- fabletools::new_specials(
                           "parPHI" = parPHI, "parPHI_range" = parPHI_range, "parPHI_increment" = parPHI_increment,
                           "uroot_test" = uroot_test, "uroot_alpha" = uroot_alpha, "uroot_type" = uroot_type, "uroot_maxd" = uroot_maxd)
                   },
-   season = function(type = "A", test = TRUE, period = NULL, method = "decomp",
+   season = function(type = "M", test = TRUE, period = NULL, method = "decomp",
                   suroot_test = "correlogram", suroot_tcrit = 1.28, suroot_alpha = 0.05, suroot_uroot = TRUE,
                   suroot_m = NULL, suroot_maxD = 1, multi_period = "min")
                   {
