@@ -11,6 +11,9 @@
 
 \item{...}{Unused.}
 }
+\value{
+The forecasting model's name.
+}
 \description{
 Format of ATA model
 }

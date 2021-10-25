@@ -11,6 +11,9 @@
 
 \item{...}{Unused.}
 }
+\value{
+a summary for the results of the ATAforecasting
+}
 \description{
 Specialized Screen Print Function of ATA model
 }

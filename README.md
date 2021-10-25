@@ -1,5 +1,5 @@
 # fable.ata
-Fable Modelling Wrappers for ATAforecasting Package
+'ATAforecasting' Modelling Interface for 'fable'
 
 This package provides a tidy R interface to the Ata method
 procedure using [fable](https://github.com/tidyverts/fable). This

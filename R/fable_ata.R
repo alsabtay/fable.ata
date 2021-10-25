@@ -431,11 +431,9 @@ residuals.ATA <- function(object, ...){
 #' @return A [fabletools::dable()] containing estimated states.
 #'
 #' @examples
-#' \dontrun{
 #' library(fable.ata)
 #' as_tsibble(USAccDeaths) %>%
 #'   model(ata = AutoATA(value ~ trend("A") + season("A"))) %>% components()
-#'}
 #'
 #' @importFrom fabletools as_dable
 #' @importFrom rlang sym expr list2 ":="
@@ -550,6 +548,8 @@ model_sum.ATA <- function(x, ...){
 #' @param x An estimated model.
 #' @param ... Unused.
 #'
+#' @return The forecasting model's name.
+#'
 #' @export
 format.ATA <- function(x, ...){
   "ATA"
@@ -559,6 +559,8 @@ format.ATA <- function(x, ...){
 #'
 #' @param object An estimated model.
 #' @param ... Unused.
+#'
+#' @return a summary for the results of the ATAforecasting
 #'
 #' @examples
 #'  library(fable.ata)
