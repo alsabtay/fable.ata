@@ -430,11 +430,6 @@ residuals.ATA <- function(object, ...){
 #'
 #' @return A [fabletools::dable()] containing estimated states.
 #'
-#' @examples
-#' library(fable.ata)
-#' as_tsibble(USAccDeaths) %>%
-#'   model(ata = AutoATA(value ~ trend("A") + season("A"))) %>% components()
-#'
 #' @importFrom fabletools as_dable
 #' @importFrom rlang sym expr list2 ":="
 #' @importFrom tsibble measured_vars index
