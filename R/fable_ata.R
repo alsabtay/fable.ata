@@ -429,7 +429,7 @@ residuals.ATA <- function(object, ...){
 #' @param ... Unused.
 #'
 #' @return A [fabletools::dable()] containing estimated states.
-#'
+#'   
 #' @importFrom fabletools as_dable
 #' @importFrom rlang sym expr list2 ":="
 #' @importFrom tsibble measured_vars index
