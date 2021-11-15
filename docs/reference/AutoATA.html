@@ -165,7 +165,7 @@ This methodology performed well on the M3 and M4-competition data.</p>
 </pre>
 
 <table class='table'>
-<tr><td>`parP`</td><td>The value of the smoothing parameter for the level. If `p = 0`, the level will not change over time. Conversely, if `p = 1` the level will update similarly to a random walk process. If NULL or "opt", it is estimated. <code>p</code> has all integer values from 1 to <code><a href='https://rdrr.io/r/base/length.html'>length(data)</a></code>.</td></tr>
+<tr><td>`parP`</td><td>The value of the smoothing parameter for the level. If `p = 0`, the level will not change over time. Conversely, if `p = 1` the level will update similarly to a random walk process. If NULL or "opt", it is estimated. <code>p</code> has all integer values from 1 to <code>length(data)</code>.</td></tr>
 <tr><td>`level_fixed`</td><td>If TRUE, "pStarQ"  --&gt; First, fits ATA(p,0) where p = p* is optimized for q=0. Then, fits ATA(p*,q) where q is optimized for p = p*.</td></tr>
 <tr><td>`initial_level`</td><td>If NULL, FALSE is default. If FALSE, ATA Method calculates the pth observation in <code>data</code> for level. If TRUE, ATA Method calculates average of first p value in <code>data</code>for level.</td></tr>
 </table>
@@ -217,7 +217,7 @@ This methodology performed well on the M3 and M4-competition data.</p>
 
 <h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>accuracy</h3>
 <p>The `accuracy` special is used to the optimization criterion for selecting the best ATA Method forecasting.</p><pre>
-<span class='fu'>accuracy</span><span class='op'>(</span>criteria <span class='op'>=</span> <span class='st'>"sMAPE"</span>, nmse <span class='op'>=</span> <span class='fl'>3</span>, ic <span class='op'>=</span> <span class='st'>"AIC"</span><span class='op'>)</span>
+<span class='fu'><a href='https://fabletools.tidyverts.org/reference/accuracy.html'>accuracy</a></span><span class='op'>(</span>criteria <span class='op'>=</span> <span class='st'>"sMAPE"</span>, nmse <span class='op'>=</span> <span class='fl'>3</span>, ic <span class='op'>=</span> <span class='st'>"AIC"</span><span class='op'>)</span>
 </pre>
 
 <table class='table'>
@@ -261,13 +261,14 @@ This methodology performed well on the M3 and M4-competition data.</p>
 
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://alsabtay.github.io/fable.ata/'>fable.ata</a></span><span class='op'>)</span>
-<span class='fu'>as_tsibble</span><span class='op'>(</span><span class='va'>USAccDeaths</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='fu'>model</span><span class='op'>(</span>ata <span class='op'>=</span> <span class='fu'>AutoATA</span><span class='op'>(</span><span class='va'>value</span> <span class='op'>~</span> <span class='fu'>trend</span><span class='op'>(</span><span class='st'>"A"</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'>season</span><span class='op'>(</span><span class='st'>"A"</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span style='color: #949494;'># A mable: 1 x 1</span>
-#&gt;                     ata
-#&gt;                 <span style='color: #949494; font-style: italic;'>&lt;model&gt;</span>
-#&gt; <span style='color: #BCBCBC;'>1</span> &lt;ATA(14,0,1) (A,N,A)&gt;</div><div class='input'>
-</div></pre>
+    <pre class="examples"><span class='r-in'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://alsabtay.github.io/fable.ata/'>fable.ata</a></span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'><a href='https://tsibble.tidyverts.org/reference/as-tsibble.html'>as_tsibble</a></span><span class='op'>(</span><span class='va'>USAccDeaths</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> <span class='fu'><a href='https://fabletools.tidyverts.org/reference/model.html'>model</a></span><span class='op'>(</span>ata <span class='op'>=</span> <span class='fu'>AutoATA</span><span class='op'>(</span><span class='va'>value</span> <span class='op'>~</span> <span class='fu'>trend</span><span class='op'>(</span><span class='st'>"A"</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'>season</span><span class='op'>(</span><span class='st'>"A"</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #949494;'># A mable: 1 x 1</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                     ata</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                 <span style='color: #949494; font-style: italic;'>&lt;model&gt;</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>1</span> &lt;ATA(14,0,1) (A,N,A)&gt;</span>
+<span class='r-in'></span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
