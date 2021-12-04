@@ -8,7 +8,8 @@
 #' @importFrom fabletools as_dable get_frequencies new_model_class new_model_definition
 #' @importFrom rlang enquo expr expr_text sym
 #' @importFrom stats frequency ts start
-#' @importFrom tsbox ts_ts
+#' @importFrom tsbox ts_ts ts_tsibble
 #' @importFrom tsibble as_tibble index is_tsibble measured_vars
 #' @importFrom tibble as_tibble
+#' @importFrom lubridate decimal_date
 NULL

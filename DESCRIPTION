@@ -1,8 +1,8 @@
 Package: fable.ata
 Type: Package
 Title: 'ATAforecasting' Modelling Interface for 'fable' Framework
-Version: 0.0.2
-Date: 2021-11-10
+Version: 0.0.3
+Date: 2021-12-04
 Authors@R: c(
   person("Ali Sabri", "Taylan", email="alisabritaylan@gmail.com", role=c("aut", "cre", "cph"), comment = c(ORCID = "0000-0001-9514-934X")),
   person("Hanife", "Taylan Selamlar", role=c("aut", "cph"), comment = c(ORCID = "0000-0002-4091-884X")),
@@ -23,10 +23,11 @@ Imports:
     dplyr,
     tsibble,
     distributional,
-    tsbox
+    tsbox,
+    lubridate
 Depends: 
     fabletools (>= 0.3.1),
-    ATAforecasting (>= 0.0.55)
+    ATAforecasting (>= 0.0.56)
 License: GPL (>= 3)
 URL: https://alsabtay.github.io/fable.ata/
 BugReports: https://github.com/alsabtay/fable.ata/issues
