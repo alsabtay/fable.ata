@@ -144,7 +144,7 @@ specials_ata <- fabletools::new_specials(
                    list("parP" = parP, "level_fixed" = level_fixed, "initial_level" = initial_level)
                   },
    trend = function(type = "A", parQ = NULL, initial_trend = FALSE, trend_opt = "none",
-                    parPHI = NULL, parPHI_range = c(0.8, 1.0), parPHI_increment = 0.01,
+                    parPHI = NULL, parPHI_range = c(0.0, 1.0), parPHI_increment = 0.05,
                     uroot_test = "adf", uroot_alpha = 0.05, uroot_type = "level", uroot_maxd = 2)
                    {
                      if (type == "N"){
@@ -174,10 +174,10 @@ specials_ata <- fabletools::new_specials(
                   },
    accuracy = function(criteria = "sMAPE", nmse = 3, ic = "AIC")
                     {
-                       if (nmse > 30 & criteria == "AMSE") {
+                       if (nmse > 30 & (criteria == "AMSE" | criteria == "GAMSE")) {
                          nmse <- 30
                          warning("'nmse' must be less than 30. 'nmse' is set to 30.")
-                       }else if ((is.null(nmse) | nmse <= 1) & criteria == "AMSE") {
+                       }else if ((is.null(nmse) | nmse <= 1) & (criteria == "AMSE" | criteria == "GAMSE")) {
                          nmse <- 3
                          warning("'nmse' must be greater than 1. 'nmse' is set to 3.")
                        }else{

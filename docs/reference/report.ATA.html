@@ -71,8 +71,8 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"> <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://alsabtay.github.io/fable.ata/" class="external-link">fable.ata</a></span><span class="op">)</span></span>
 <span class="r-in"> <span class="fu"><a href="https://tsibble.tidyverts.org/reference/as-tsibble.html" class="external-link">as_tsibble</a></span><span class="op">(</span><span class="va">USAccDeaths</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://fabletools.tidyverts.org/reference/model.html" class="external-link">model</a></span><span class="op">(</span>ata <span class="op">=</span> <span class="fu"><a href="AutoATA.html">AutoATA</a></span><span class="op">(</span><span class="va">value</span> <span class="op">~</span> <span class="fu">trend</span><span class="op">(</span><span class="st">"A"</span><span class="op">)</span> <span class="op">+</span> <span class="fu">season</span><span class="op">(</span><span class="st">"M"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://fabletools.tidyverts.org/reference/report.html" class="external-link">report</a></span><span class="op">(</span><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Series: value </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Model: ATA(14,1,0.8) (A,Ad,M) </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ATA(14,1,0.8) (A,Ad,M) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Model: ATA(14,2,0.6) (A,Ad,M) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ATA(14,2,0.6) (A,Ad,M) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    model.type: A </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -87,16 +87,16 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> In-Sample Accuracy Measures: </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         sigma2         loglik            MAE            MSE           RMSE </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 66085.05275793  -553.00959900   200.57045073 66085.05275793   257.07013198 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 73037.26402101  -553.43204388   200.59247218 66865.10086431   258.58287040 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>            MPE           MAPE          sMAPE           MASE            OWA </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     0.09019897     2.26214497     2.26541088     0.10205173     0.00059918 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     0.06492224     2.25943619     2.26185178     0.10206293     0.00059828 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> In-Sample Accuracy Measures: </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>           MdAE           MdSE          RMdSE           MdPE          MdAPE </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   184.68577277 34108.83466185   184.68577277    -0.00747289     2.00840434 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   180.23217724 32483.63771314   180.23217724     0.00567211     1.91841057 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         sMdAPE </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     2.02877737 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     1.93699028 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Out-Sample Accuracy Measures: </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -111,13 +111,13 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> Information Criteria: </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      AIC     AICc      BIC </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1120.019 1121.769 1135.956 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1120.864 1122.614 1136.801 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    user  system elapsed </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   0.163   0.022   0.186 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   0.160   0.020   0.181 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> calculation.time: 0.1867 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> calculation.time: 0.1815 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"></span>
