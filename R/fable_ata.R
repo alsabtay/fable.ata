@@ -75,6 +75,7 @@ train_ata <- function(.data, specials, ...){
                   holdout = holdout$holdout,
                   holdout.adjustedP = holdout$adjustment,
                   holdout.set_size = holdout$set_size,
+                  holdout.onestep = holdout$onestep,
                   holdin = FALSE,
                   transform.order = ifelse(transform$order == "none", "before", transform$order),
                   transform.method = switch((transform$method != "none") + 1, NULL, transform$method),
@@ -88,6 +89,7 @@ train_ata <- function(.data, specials, ...){
                   end.phi = trend$parPHI_range[2],
                   size.phi = trend$parPHI_increment,
                   negative.forecast = TRUE,
+                  onestep = FALSE,
                   print.out = FALSE,
                   plot.out = FALSE)
   mdl_ATA <- pmdl_ATA[["result"]]
@@ -104,46 +106,49 @@ train_ata <- function(.data, specials, ...){
     seas_mthd <- mdl_ATA$seasonal.type
   }
   # Return model
-  ata_out <-  list(
-    "par" = tsibble::tibble(term = names(unlist(mdl_ATA$par.specs)), estimate = unlist(mdl_ATA$par.specs)),
-    "est" = dplyr::mutate(dplyr::ungroup(.data),
-                          ".fitted" = mdl_ATA$fitted,
-                          ".resid" = mdl_ATA$residuals),
-    "fit" = mdl_ATA$accuracy$fits,
-    "components" = list("coefp" = mdl_ATA$coefp,
-                        "coefq" = mdl_ATA$coefp,
-                        "P" = mdl_ATA$p,
-                        "Q" = mdl_ATA$q,
-                        "PHI" = mdl_ATA$phi,
-                        "response" = mdl_ATA$actual,
-                        "level" = mdl_ATA$level,
-                        "trend" = mdl_ATA$trend,
-                        "season" = mdl_ATA$seasonal,
-                        "seasindex" = mdl_ATA$seasonal.index,
-                        "seasadj" = mdl_ATA$seasonal.adjusted,
-                        "remainder" = mdl_ATA$residuals),
-    "transform" = list("method" = transform$method,
-                       "order" = transform$order,
-                       "lambda" = mdl_ATA$lambda,
-                       "shift" = mdl_ATA$shift),
-    "holdout" = list("holdout" = mdl_ATA$holdout,
-                     "adjustment" = holdout$adjustment),
-    "spec" = list("errortype" = "A",
-                  "trendtype" = trend_mthd,
-                  "seasontype" = seas_mthd,
-                  "damped" = ifelse(mdl_ATA$phi==1, FALSE, TRUE),
-                  "period" = mdl_ATA$seasonal.period,
-                  "method" = mdl_ATA$method),
-    "model_output" = mdl_ATA)
-  structure(ata_out, class = "ATA")
+   structure( 
+     list(
+         par = tsibble::tibble(term = names(unlist(mdl_ATA$par.specs)), estimate = unlist(mdl_ATA$par.specs)),
+         est = dplyr::mutate(dplyr::ungroup(.data),
+                              .fitted = mdl_ATA$fitted,
+                              .resid = mdl_ATA$residuals),
+         fit = mdl_ATA$accuracy$fits,
+         components = list("coefp" = mdl_ATA$coefp,
+                            "coefq" = mdl_ATA$coefp,
+                            "P" = mdl_ATA$p,
+                            "Q" = mdl_ATA$q,
+                            "PHI" = mdl_ATA$phi,
+                            "response" = mdl_ATA$actual,
+                            "level" = mdl_ATA$level,
+                            "trend" = mdl_ATA$trend,
+                            "season" = mdl_ATA$seasonal,
+                            "seasindex" = mdl_ATA$seasonal.index,
+                            "seasadj" = mdl_ATA$seasonal.adjusted,
+                            "remainder" = mdl_ATA$residuals),
+          transform = list("method" = transform$method,
+                           "order" = transform$order,
+                           "lambda" = mdl_ATA$lambda,
+                           "shift" = mdl_ATA$shift),
+          holdout = list("holdout" = mdl_ATA$holdout,
+                         "adjustment" = holdout$adjustment,
+                         "onestep" = holdout$onestep),
+          spec = list("errortype" = "A",
+                      "trendtype" = trend_mthd,
+                      "seasontype" = seas_mthd,
+                      "damped" = ifelse(mdl_ATA$phi==1, FALSE, TRUE),
+                      "period" = mdl_ATA$seasonal.period,
+                      "method" = mdl_ATA$method,
+                      "onestep" = mdl_ATA$onestep),
+          model_output = mdl_ATA),
+          class = "ATA")
 }
 
 specials_ata <- fabletools::new_specials(
-   level = function(parP= NULL, level_fixed = FALSE, initial_level = FALSE)
+   level = function(parP= NULL, level_fixed = FALSE, initial_level = "none")
                   {
                    list("parP" = parP, "level_fixed" = level_fixed, "initial_level" = initial_level)
                   },
-   trend = function(type = "A", parQ = NULL, initial_trend = FALSE, trend_opt = "none",
+   trend = function(type = "A", parQ = NULL, initial_trend = "none", trend_opt = "none",
                     parPHI = NULL, parPHI_range = c(0.0, 1.0), parPHI_increment = 0.05,
                     uroot_test = "adf", uroot_alpha = 0.05, uroot_type = "level", uroot_maxd = 2)
                    {
@@ -190,9 +195,9 @@ specials_ata <- fabletools::new_specials(
                         list("method" = method, "order" = order, "lambda" = lambda, "shift" = shift,
                         "bcMethod" = bcMethod, "bcLower" = bcLower, "bcUpper" = bcUpper)
                       },
-   holdout = function(holdout = FALSE, adjustment = TRUE, set_size = NULL )
+   holdout = function(holdout = FALSE, adjustment = TRUE, set_size = NULL, onestep = FALSE )
                     {
-                        list("holdout" = holdout, "adjustment" = adjustment, "set_size" = set_size)
+                        list("holdout" = holdout, "adjustment" = adjustment, "set_size" = set_size, "onestep" = onestep)
                     },
    .required_specials = c("level", "trend", "season", "accuracy", "transform", "holdout")
 )
@@ -224,13 +229,13 @@ specials_ata <- fabletools::new_specials(
 #' \subsection{level}{
 #' The `level` special is used to specify the form of the level term.
 #' \preformatted{
-#' level(parP = NULL, level_fixed = TRUE, initial_level = FALSE)
+#' level(parP = NULL, level_fixed = TRUE, initial_level = "none")
 #' }
 #'
 #' \tabular{ll}{
 #'   `parP`     \tab The value of the smoothing parameter for the level. If `p = 0`, the level will not change over time. Conversely, if `p = 1` the level will update similarly to a random walk process. If NULL or "opt", it is estimated. \code{p} has all integer values from 1 to \code{length(data)}. \cr
 #'   `level_fixed`      \tab If TRUE, "pStarQ"  --> First, fits ATA(p,0) where p = p* is optimized for q=0. Then, fits ATA(p*,q) where q is optimized for p = p*. \cr
-#'   `initial_level`     \tab If NULL, FALSE is default. If FALSE, ATA Method calculates the pth observation in \code{data} for level. If TRUE, ATA Method calculates average of first p value in \code{data}for level. \cr
+#'   `initial_level`     \tab If NULL, "none" is default. If "none", ATA Method calculates the pth observation in \code{data} for level. If "mean", ATA Method calculates average of first p value in \code{data}for level. If "median", ATA Method calculates median of first p value in \code{data}for level. \cr
 #'
 #' }
 #' }
@@ -238,7 +243,7 @@ specials_ata <- fabletools::new_specials(
 #' \subsection{trend}{
 #' The `trend` special is used to specify the form of the trend term and associated parameters.
 #' \preformatted{
-#' trend(type = "A", parQ = NULL, initial_trend = FALSE, opt_trend = "none",
+#' trend(type = "A", parQ = NULL, initial_trend = "none", opt_trend = "none",
 #'        parPHI = NULL, parPHI_range = c(0.8, 1.0), parPHI_increment = 0.01,
 #'        uroot_test = "adf", uroot_alpha = 0.05, uroot_type = "level")
 #' }
@@ -249,7 +254,7 @@ specials_ata <- fabletools::new_specials(
 #'   `parPHI` \tab The value of the dampening parameter for the slope. If `phi = 0`, the slope will be dampened immediately (no slope). Conversely, if `phi = 1` the slope will not be dampened. \cr
 #'   `parPHI_range`       \tab If `phi=NULL`, `phi_range` provides bounds for the optimised value of `phi`.\cr
 #'   `parPHI_increment`  \tab If `phi=NULL`, `parPHI_increment` provides increment step for searching `phi`. If NULL, `parPHI_increment` will be determined as the value that allows the `parPHI_range` to be divided into 20 equal parts. \cr
-#'   `initial_trend`        \tab If NULL, FALSE is default. If FALSE, ATA Method calculates the qth observation in \code{X(T)-X(T-1)} for trend. If TRUE, ATA Method calculates average of first q value in \code{X(T)-X(T-1)} for trend. \cr
+#'   `initial_trend`     \tab If NULL, "none" is default. If "none", ATA Method calculates the qth observation in \code{data} for trend. If "mean", ATA Method calculates average of first q value in \code{X(T)-X(T-1)} for trend. If "median", ATA Method calculates median of first q value in \code{X(T)-X(T-1)} for trend. \cr
 #'   `trend_opt`        \tab Default is `none`. If `fixed` is set, "pBullet" --> Fits ATA(p,1) where p = p* is optimized for q = 1. If `search` is set "qBullet" --> Fits ATA(p,q) where p = p* is optimized for q = q* (q > 0). Then, fits ATA(p*,q) where q is optimized for p = p*. \cr
 #'   `uroot_test`        \tab Type of unit root test before all type seasonality test. Possible values are "adf", "pp" and "kpss". \cr
 #'   `uroot_alpha`   \tab Significant level of the unit root test, possible values range from 0.01 to 0.1. \cr
@@ -312,13 +317,14 @@ specials_ata <- fabletools::new_specials(
 #' \subsection{holdout}{
 #' The `holdout` special is used to improve the optimized parameter value obtained for the ATA Method forecasting.
 #' \preformatted{
-#' holdout(holdout = FALSE, adjustment = TRUE, set_size = NULL)
+#' holdout(holdout = FALSE, adjustment = TRUE, set_size = NULL, onestep = FALSE)
 #' }
 #'
 #' \tabular{ll}{
 #'   `holdout`     \tab Default is FALSE. If TRUE, ATA Method uses the holdout forecasting for accuracy measure to select the best parameter set. In holdout forecasting, this parameter divides `data` into two parts: training set (in-sample) and validation set (holdout set). \cr
 #'   `adjustment`     \tab Default is TRUE. If TRUE, `parP` will be adjusted by length of training, validation sets and main data set when the holdout forecasting is active. \cr
 #'   `set_size`     \tab If `holdout` is TRUE, this parameter divides `data` into two parts: training set (in-sample) and validation set (holdout set). Also, this parameter will be same as `h` for defining holdout set.  \cr
+#'   `onestep`     \tab Default is FALSE. if TRUE, the dynamic forecast strategy uses a one-step model multiple times `h` (forecast horizon) where the holdout prediction for the prior time step is used as an input for making a prediction on the following time step.
 #' }
 #' }
 #'
@@ -345,6 +351,7 @@ AutoATA <- function(formula, ...){
 #' @param h The forecast horison (can be used instead of `new_data` for regular time series with no exogenous regressors).
 #' @param ci_level Confidence Interval levels for forecasting. Default value is 95.
 #' @param negative_forecast Negative values are allowed for forecasting. Default value is TRUE. If FALSE, all negative values for forecasting are set to 0.
+#' @param onestep Default is FALSE. if TRUE, the dynamic forecast strategy uses a one-step model multiple times `h` forecast horizon) where the prediction for the prior time step is used as an input for making a prediction on the following time step.
 #' @param ... Other arguments
 #'
 #' @return A vector of fitted residuals.
@@ -362,14 +369,10 @@ AutoATA <- function(formula, ...){
 #' @importFrom distributional dist_degenerate
 #'
 #' @export
-forecast.ATA <- function(object, new_data, h=NULL, ci_level=95, negative_forecast=TRUE, ...){
+forecast.ATA <- function(object, new_data, h=NULL, ci_level=95, negative_forecast=TRUE, onestep=FALSE, ...){
   mdl <- object$model_output
   spec_mdl <- object$spec
-  if(missing(new_data)){
-    mh <- h
-  }else{
-    mh <- nrow(new_data)
-  }
+  mh <- nrow(new_data)
   if (is.null(mh)){
     if (spec_mdl$period==4){
       mh <- 8
@@ -394,7 +397,7 @@ forecast.ATA <- function(object, new_data, h=NULL, ci_level=95, negative_forecas
   colnames(test_set) <- c("ds", "yh")
   pre_data <- quietly(tsbox::ts_ts)(new_data)
   test_set <- stats::ts(pre_data, frequency = spec_mdl$period, start = start(pre_data))
-  pfc <- safely(quietly(ATAforecasting::ATA.Forecast))(mdl, mh, test_set, ci_level, negative_forecast, print.out = FALSE)
+  pfc <- safely(quietly(ATAforecasting::ATA.Forecast))(mdl, mh, test_set, ci_level, negative_forecast, onestep, print.out = FALSE)
  }
   fc <- pfc[["result"]]
   # Return forecasts

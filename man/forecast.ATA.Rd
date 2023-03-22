@@ -10,6 +10,7 @@
   h = NULL,
   ci_level = 95,
   negative_forecast = TRUE,
+  onestep = FALSE,
   ...
 )
 }
@@ -23,6 +24,8 @@
 \item{ci_level}{Confidence Interval levels for forecasting. Default value is 95.}
 
 \item{negative_forecast}{Negative values are allowed for forecasting. Default value is TRUE. If FALSE, all negative values for forecasting are set to 0.}
+
+\item{onestep}{Default is FALSE. if TRUE, the dynamic forecast strategy uses a one-step model multiple times `h` forecast horizon) where the prediction for the prior time step is used as an input for making a prediction on the following time step.}
 
 \item{...}{Other arguments}
 }

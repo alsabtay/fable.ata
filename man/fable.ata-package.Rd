@@ -6,9 +6,9 @@
 \alias{fable.ata-package}
 \title{fable.ata: 'ATAforecasting' Modelling Interface for 'fable' Framework}
 \description{
-Allows ATA (Automatic Time series analysis using the Ata method) models from the 'ATAforecasting' package to be used in a tidy workflow with the modeling interface of 'fabletools'. This extends 'ATAforecasting' to provide enhanced model specification and management, performance evaluation methods, and model combination tools. The Ata method (Yapar et al. (2019) <doi:10.15672/hujms.461032>), an alternative to exponential smoothing (described in Yapar (2016) <doi:10.15672/HJMS.201614320580>, Yapar et al. (2017) <doi:10.15672/HJMS.2017.493>), is a new univariate time series forecasting method which provides innovative solutions to issues faced during the initialization and optimization stages of existing forecasting methods. Forecasting performance of the Ata method is superior to existing methods both in terms of easy implementation and accurate forecasting. It can be applied to non-seasonal or seasonal time series which can be decomposed into four components (remainder, level, trend and seasonal).
+Allows ATA (Automatic Time series analysis using the Ata method) models from the 'ATAforecasting' package to be used in a tidy workflow with the modeling interface of 'fabletools'. This extends 'ATAforecasting' to provide enhanced model specification and management, performance evaluation methods, and model combination tools. The Ata method (Yapar et al. (2019) \doi{10.15672/hujms.461032}), an alternative to exponential smoothing (described in Yapar (2016) \doi{10.15672/HJMS.201614320580}, Yapar et al. (2017) \doi{10.15672/HJMS.2017.493}), is a new univariate time series forecasting method which provides innovative solutions to issues faced during the initialization and optimization stages of existing forecasting methods. Forecasting performance of the Ata method is superior to existing methods both in terms of easy implementation and accurate forecasting. It can be applied to non-seasonal or seasonal time series which can be decomposed into four components (remainder, level, trend and seasonal).
 
-Allows ATA (Automatic Time series analysis using the Ata method) models from the 'ATAforecasting' package to be used in a tidy workflow with the modeling interface of 'fabletools'. This extends 'ATAforecasting' to provide enhanced model specification and management, performance evaluation methods, and model combination tools. The Ata method (Yapar et al. (2019) <doi:10.15672/hujms.461032>), an alternative to exponential smoothing (described in Yapar (2016) <doi:10.15672/HJMS.201614320580>, Yapar et al. (2017) <doi:10.15672/HJMS.2017.493>), is a new univariate time series forecasting method which provides innovative solutions to issues faced during the initialization and optimization stages of existing forecasting methods. Forecasting performance of the Ata method is superior to existing methods both in terms of easy implementation and accurate forecasting. It can be applied to non-seasonal or seasonal time series which can be decomposed into four components (remainder, level, trend and seasonal).
+Allows ATA (Automatic Time series analysis using the Ata method) models from the 'ATAforecasting' package to be used in a tidy workflow with the modeling interface of 'fabletools'. This extends 'ATAforecasting' to provide enhanced model specification and management, performance evaluation methods, and model combination tools. The Ata method (Yapar et al. (2019) \doi{10.15672/hujms.461032}), an alternative to exponential smoothing (described in Yapar (2016) \doi{10.15672/HJMS.201614320580}, Yapar et al. (2017) \doi{10.15672/HJMS.2017.493}), is a new univariate time series forecasting method which provides innovative solutions to issues faced during the initialization and optimization stages of existing forecasting methods. Forecasting performance of the Ata method is superior to existing methods both in terms of easy implementation and accurate forecasting. It can be applied to non-seasonal or seasonal time series which can be decomposed into four components (remainder, level, trend and seasonal).
 }
 \seealso{
 Useful links:
@@ -26,15 +26,6 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Ali Sabri Taylan \email{alisabritaylan@gmail.com} (\href{https://orcid.org/0000-0001-9514-934X}{ORCID}) [copyright holder]
-
-Authors:
-\itemize{
-  \item Hanife Taylan Selamlar (\href{https://orcid.org/0000-0002-4091-884X}{ORCID}) [copyright holder]
-  \item Guckan Yapar (\href{https://orcid.org/0000-0002-0971-6676}{ORCID}) [thesis advisor, copyright holder]
-}
-
-
 \strong{Maintainer}: Ali Sabri Taylan \email{alisabritaylan@gmail.com} (\href{https://orcid.org/0000-0001-9514-934X}{ORCID}) [copyright holder]
 
 Authors:

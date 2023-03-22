@@ -38,13 +38,13 @@ There are a couple of limitations to note about ATA method:
 \subsection{level}{
 The `level` special is used to specify the form of the level term.
 \preformatted{
-level(parP = NULL, level_fixed = TRUE, initial_level = FALSE)
+level(parP = NULL, level_fixed = TRUE, initial_level = "none")
 }
 
 \tabular{ll}{
   `parP`     \tab The value of the smoothing parameter for the level. If `p = 0`, the level will not change over time. Conversely, if `p = 1` the level will update similarly to a random walk process. If NULL or "opt", it is estimated. \code{p} has all integer values from 1 to \code{length(data)}. \cr
   `level_fixed`      \tab If TRUE, "pStarQ"  --> First, fits ATA(p,0) where p = p* is optimized for q=0. Then, fits ATA(p*,q) where q is optimized for p = p*. \cr
-  `initial_level`     \tab If NULL, FALSE is default. If FALSE, ATA Method calculates the pth observation in \code{data} for level. If TRUE, ATA Method calculates average of first p value in \code{data}for level. \cr
+  `initial_level`     \tab If NULL, "none" is default. If "none", ATA Method calculates the pth observation in \code{data} for level. If "mean", ATA Method calculates average of first p value in \code{data}for level. If "median", ATA Method calculates median of first p value in \code{data}for level. \cr
 
 }
 }
@@ -52,7 +52,7 @@ level(parP = NULL, level_fixed = TRUE, initial_level = FALSE)
 \subsection{trend}{
 The `trend` special is used to specify the form of the trend term and associated parameters.
 \preformatted{
-trend(type = "A", parQ = NULL, initial_trend = FALSE, opt_trend = "none",
+trend(type = "A", parQ = NULL, initial_trend = "none", opt_trend = "none",
        parPHI = NULL, parPHI_range = c(0.8, 1.0), parPHI_increment = 0.01,
        uroot_test = "adf", uroot_alpha = 0.05, uroot_type = "level")
 }
@@ -63,7 +63,7 @@ trend(type = "A", parQ = NULL, initial_trend = FALSE, opt_trend = "none",
   `parPHI` \tab The value of the dampening parameter for the slope. If `phi = 0`, the slope will be dampened immediately (no slope). Conversely, if `phi = 1` the slope will not be dampened. \cr
   `parPHI_range`       \tab If `phi=NULL`, `phi_range` provides bounds for the optimised value of `phi`.\cr
   `parPHI_increment`  \tab If `phi=NULL`, `parPHI_increment` provides increment step for searching `phi`. If NULL, `parPHI_increment` will be determined as the value that allows the `parPHI_range` to be divided into 20 equal parts. \cr
-  `initial_trend`        \tab If NULL, FALSE is default. If FALSE, ATA Method calculates the qth observation in \code{X(T)-X(T-1)} for trend. If TRUE, ATA Method calculates average of first q value in \code{X(T)-X(T-1)} for trend. \cr
+  `initial_trend`     \tab If NULL, "none" is default. If "none", ATA Method calculates the qth observation in \code{data} for trend. If "mean", ATA Method calculates average of first q value in \code{X(T)-X(T-1)} for trend. If "median", ATA Method calculates median of first q value in \code{X(T)-X(T-1)} for trend. \cr
   `trend_opt`        \tab Default is `none`. If `fixed` is set, "pBullet" --> Fits ATA(p,1) where p = p* is optimized for q = 1. If `search` is set "qBullet" --> Fits ATA(p,q) where p = p* is optimized for q = q* (q > 0). Then, fits ATA(p*,q) where q is optimized for p = p*. \cr
   `uroot_test`        \tab Type of unit root test before all type seasonality test. Possible values are "adf", "pp" and "kpss". \cr
   `uroot_alpha`   \tab Significant level of the unit root test, possible values range from 0.01 to 0.1. \cr
@@ -126,13 +126,14 @@ transform(method="none", order = "none", lambda = NULL, shift = 0,
 \subsection{holdout}{
 The `holdout` special is used to improve the optimized parameter value obtained for the ATA Method forecasting.
 \preformatted{
-holdout(holdout = FALSE, adjustment = TRUE, set_size = NULL)
+holdout(holdout = FALSE, adjustment = TRUE, set_size = NULL, onestep = FALSE)
 }
 
 \tabular{ll}{
   `holdout`     \tab Default is FALSE. If TRUE, ATA Method uses the holdout forecasting for accuracy measure to select the best parameter set. In holdout forecasting, this parameter divides `data` into two parts: training set (in-sample) and validation set (holdout set). \cr
   `adjustment`     \tab Default is TRUE. If TRUE, `parP` will be adjusted by length of training, validation sets and main data set when the holdout forecasting is active. \cr
   `set_size`     \tab If `holdout` is TRUE, this parameter divides `data` into two parts: training set (in-sample) and validation set (holdout set). Also, this parameter will be same as `h` for defining holdout set.  \cr
+  `onestep`     \tab Default is FALSE. if TRUE, the dynamic forecast strategy uses a one-step model multiple times `h` (forecast horizon) where the holdout prediction for the prior time step is used as an input for making a prediction on the following time step.
 }
 }
 }
