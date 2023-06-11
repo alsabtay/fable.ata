@@ -76,16 +76,18 @@
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
+<p>You can install the <strong>stable</strong> version from <a href="https://cran.r-project.org/package=fable.ata" class="external-link">CRAN</a>:</p>
+<pre><code><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"fable.ata"</span><span class="op">)</span></span></code></pre>
 <p>You can install the <strong>development</strong> version from <a href="https://github.com/alsabtay/fable.ata" class="external-link">Github</a> with:</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># install.packages("remotes")</span></span>
-<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"alsabtay/fable.ata"</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># install.packages("devtools")</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"alsabtay/fable.ata"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
 </h2>
 <p>USAccDeaths: Accidental Deaths in the US 1973–1978</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://alsabtay.github.io/fable.ata/" class="external-link">fable.ata</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://tsibble.tidyverts.org/reference/as-tsibble.html" class="external-link">as_tsibble</a></span><span class="op">(</span><span class="va">USAccDeaths</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://fabletools.tidyverts.org/reference/model.html" class="external-link">model</a></span><span class="op">(</span>ata <span class="op">=</span> <span class="fu"><a href="reference/AutoATA.html">AutoATA</a></span><span class="op">(</span><span class="va">value</span> <span class="op">~</span> <span class="fu">trend</span><span class="op">(</span><span class="st">"A"</span><span class="op">)</span> <span class="op">+</span> <span class="fu">season</span><span class="op">(</span><span class="st">"A"</span>, method <span class="op">=</span> <span class="st">"stl"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://generics.r-lib.org/reference/forecast.html" class="external-link">forecast</a></span><span class="op">(</span>h<span class="op">=</span><span class="fl">24</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -97,6 +99,8 @@
 <p><a href="https://github.com/alsabtay/ATAforecasting" class="external-link">Github - ATAforecasting</a></p>
 <p><a href="https://alsabtay.github.io/ATAforecasting/" class="external-link">Github.io - ATAforecasting</a></p>
 <p><a href="https://atamethod.wordpress.com/" class="external-link">Project team website</a></p>
+<p><a href="https://github.com/alsabtay/intermittentATA" class="external-link">Github - Intermittent Ata Method Package</a></p>
+<p><a href="https://alsabtay.github.io/intermittentATA/index.html" class="external-link">Github.io Intermittent Ata Method Package</a></p>
 </div>
 <div class="section level2">
 <h2 id="license">License<a class="anchor" aria-label="anchor" href="#license"></a>
