@@ -471,25 +471,25 @@ components.ATA <- function(object, ...){
     f_cmp <- dplyr::mutate(dplyr::ungroup(est_vars),
                             "level" = cmp$level,
                             "season" = cmp$season)
-    f_cmp <- dplyr::select(f_cmp, intersect(c(idx, response, "level", "season", "remainder"), colnames(f_cmp)))
+    f_cmp <- dplyr::select(f_cmp, intersect(c(expr_text(idx), response, "level", "season", "remainder"), colnames(f_cmp)))
     seasonality <- list("season" = cmp$season)
   } else if (spec$trendtype != "N" & spec$seasontype == "N"){
     f_cmp <- dplyr::mutate(dplyr::ungroup(est_vars),
                             "level" = cmp$level,
                             "trend" = cmp$trend)
-    f_cmp <- dplyr::select(f_cmp, intersect(c(idx, response, "level", "trend", "remainder"), colnames(f_cmp)))
+    f_cmp <- dplyr::select(f_cmp, intersect(c(expr_text(idx), response, "level", "trend", "remainder"), colnames(f_cmp)))
     seasonality <- list()
   }else if (spec$trendtype == "N" & spec$seasontype == "N") {
     f_cmp <- dplyr::mutate(dplyr::ungroup(est_vars),
                             "level" = cmp$level)
-    f_cmp <- dplyr::select(f_cmp, intersect(c(idx, response, "level", "remainder"), colnames(f_cmp)))
+    f_cmp <- dplyr::select(f_cmp, intersect(c(expr_text(idx), response, "level", "remainder"), colnames(f_cmp)))
     seasonality <- list()
   }else {
     f_cmp <- dplyr::mutate(dplyr::ungroup(est_vars),
                             "level" = cmp$level,
                             "trend" = cmp$trend,
                             "season" = cmp$season)
-    f_cmp <- dplyr::select(f_cmp, intersect(c(idx, response, "level", "trend", "season", "remainder"), colnames(f_cmp)))
+    f_cmp <- dplyr::select(f_cmp, intersect(c(expr_text(idx), response, "level", "trend", "season", "remainder"), colnames(f_cmp)))
     seasonality <- list("season" = cmp$season)
   }
 
